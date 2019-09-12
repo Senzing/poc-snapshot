@@ -89,5 +89,6 @@ Optional parameters ...
 - The -s sample size parameter can be added to inlcude either more or less samples in the json file.
 - The -f relationship filter can be included if you don't care about relationships.  It runs faster without computing them.   However, it is highly recommended that you at least include possible matches.
 - The -n parameter can be included if you only want the json statistics and not the csv file.  This also makes it run faster.  However, the csv file can be used to compare results between runs and and has all the matches, not just the samples included in the json.
-- The -k chunk size parameter may be required if your database server is running out of temp space. Try 500000 (500k) rather than default million record chunk size if you have this problem.
+- The -k chunk size parameter may be required if your database server is running out of temp space. Try 500000 (500k) rather than default of 1 million if you have this problem.
 
+The poc_snapshot utility runs pretty fast since it queries the database directly. For instance, it should take no more than an hour to run on a 100 million record database.
