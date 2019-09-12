@@ -609,7 +609,7 @@ if __name__ == '__main__':
 
     #--capture the command line arguments
     argParser = argparse.ArgumentParser()
-    argParser.add_argument('-o', '--output_file_root', dest='output_file_root', default=os.getenv('sz_output_file_root', None), help='root name for files created such as "/project/audit/run1"')
+    argParser.add_argument('-o', '--output_file_root', dest='output_file_root', default=os.getenv('sz_output_file_root', None), help='root name for files created such as "/project/snapshots/snapshot1"')
     argParser.add_argument('-c', '--ini_file_name', dest='ini_file_name', default=iniFileName, help='name of the g2.ini file, defaults to %s' % iniFileName)
     argParser.add_argument('-s', '--sample_size', dest='sample_size', type=int, default=sampleSize, help='defaults to %s' % sampleSize)
     argParser.add_argument('-f', '--relationship_filter', dest='relationship_filter', type=int, default=relationshipFilter, help='filter options 1=No Relationships, 2=Include possible matches, 3=Include possibly related and disclosed. Defaults to %s' % relationshipFilter)
