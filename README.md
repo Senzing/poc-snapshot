@@ -20,8 +20,10 @@ See https://github.com/Senzing/poc-viewer
 
 The poc-snapshot utility computes the following statistical reports ...
 - **dataSourceSummary** This report shows the matches, possible matches and relationships within each data source.
-- **crossSourceSummary** This report shows the matches, possible matches and relationships across two different data sources.
+- **crossSourceSummary** This report shows the matches, possible matches and relationships across data sources.
 - **entitySizeBreakdown** This report categorizes entities by their size (how many records they contain) and selects a list of entities to review that may be over-matched due to multiple names, addresses, DOBs, etc. 
+
+See https://senzing.zendesk.com/hc/en-us/articles/360035699253-Understanding-the-poc-snapshot-statistics
 
 Usage:
 
@@ -76,9 +78,16 @@ Its a good idea to place these settings in your .bashrc file to make sure the en
 
 ### Typical use
 ```console
-python3 poc_viewer.py 
+python3 poc_snapshot.py -o /project/snapshots/snapshot1 
 ```
-The -c configuration parameter is only required if the SZ_INI_FILE_NAME environment variable is not set.
+This will result in the following two files being generated ...
+- /project/snapshots/snapshot1.csv
+- /project/snapshots/snapshot1.json
 
-The -s snapshot file parameter is for convenience if you just took a snapshot and want to load it.
+Optional parameters ...
+- The -c configuration parameter is only required if the SZ_INI_FILE_NAME environment variable is not set.
+- The -s sample size parameter can be added to inlcude either more or less samples in the json file.
+- The -f relationship filter can be included if you don't care about relationships.  It runs faster without computing them.   However, it is highly recommended that you at least include possible matches.
+- The -n parameter can be included if you only want the json statistics and not the csv file.  This also makes it run faster.  However, the csv file can be used to compare results between runs and and has all the matches, not just the samples included in the json.
+- The -k chunk size parameter may be required if your database server is running out of temp space. Try 500000 (500k) rather than default million record chunk size if you have this problem.
 
