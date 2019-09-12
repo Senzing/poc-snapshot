@@ -2,7 +2,7 @@
 
 ## Overview
 
-The [poc_snapshot.py](poc_snapshot.py) utility takes a snapshot of the current state of the records loaded in a Senzing repository. Taking a snapshot is much like performing an export.  If you use G2Export.py to export senzing data in csv format, consider using this as an alternative.  
+The [poc_snapshot.py](poc_snapshot.py) utility takes a snapshot of the current state of the records loaded in a Senzing repository. Taking a snapshot is much like performing an export.  If you use G2Export.py to export senzing data in csv format, consider using this as an alternative.  *Caveat: The poc_snapshot utility accesses the database directly and cannot be used on sharded implementations!*
 
 See https://senzing.zendesk.com/hc/en-us/articles/115004915547-G2Export-How-to-Consume-Resolved-Entity-Data
 
@@ -15,8 +15,6 @@ The poc_snapshot exports all the same fields as G2Export except for entity_name 
 - RECORD_ID
 
 However, the biggest difference between a poc_snapshot and a G2Export is that statistics and examples are captured during the export in a companion json file.  This json file can then be loaded into the poc_viewer.py so that its statistics and examples can be browsed in an interactive report style.
-
-*Caveat: The poc_snapshot utility accesses the database directly and cannot be used on sharded implementations!*
 
 See https://github.com/Senzing/poc-viewer
 
