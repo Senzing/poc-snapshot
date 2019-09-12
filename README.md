@@ -37,7 +37,7 @@ optional arguments:
   -h, --help            show this help message and exit
   -o OUTPUT_FILE_ROOT, --output_file_root OUTPUT_FILE_ROOT
                         root name for files created such as
-                        "/project/audit/run1"
+                        "/project/snapshots/snapshot1"
   -c INI_FILE_NAME, --ini_file_name INI_FILE_NAME
                         name of the g2.ini file, defaults to
                         /opt/senzing/g2/python/G2Module.ini
