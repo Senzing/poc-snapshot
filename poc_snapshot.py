@@ -15,9 +15,6 @@ import csv
 import random
 
 #--senzing python classes
-g2pythonPath = '/opt/senzing/g2/python'
-if not os.getenv('PYTHONPATH') and os.path.exists(g2pythonPath):
-    sys.path.insert(1, g2pythonPath)
 try: from G2Database import G2Database
 except:
     print('')
@@ -573,8 +570,6 @@ def processRelationships():
             begResRelId += chunkSize
             endResRelId += chunkSize
 
-    g2Dbo.close()
-
     if shutDown:
         return 1
 
@@ -595,6 +590,8 @@ def pause(question='PRESS ENTER TO CONTINUE ...'):
 
 #----------------------------------------
 if __name__ == '__main__':
+    appPath = os.path.dirname(os.path.abspath(sys.argv[0]))
+
     global shutDown
     shutDown = False
     signal.signal(signal.SIGINT, signal_handler)
@@ -602,7 +599,7 @@ if __name__ == '__main__':
     progressInterval = 10000
 
     #--defaults
-    iniFileName = int(os.getenv('SZ_INI_FILE_NAME')) if os.getenv('SZ_INI_FILE_NAME', None) else '/opt/senzing/g2/python/G2Module.ini'
+    iniFileName = os.getenv('SZ_INI_FILE_NAME') if os.getenv('SZ_INI_FILE_NAME', None) else appPath + os.path.sep + 'G2Module.ini'
     sampleSize = int(os.getenv('SZ_SAMPLE_SIZE')) if os.getenv('SZ_SAMPLE_SIZE', None) and os.getenv('SZ_SAMPLE_SIZE').isdigit() else 1000
     relationshipFilter = int(os.getenv('SZ_RELATIONSHIP_FILTER')) if os.getenv('SZ_RELATIONSHIP_FILTER', None) and os.getenv('SZ_RELATIONSHIP_FILTER').isdigit() else 3
     chunkSize = int(os.getenv('SZ_CHUNK_SIZE')) if os.getenv('SZ_CHUNK_SIZE', None) and os.getenv('SZ_CHUNK_SIZE').isdigit() else 1000000
