@@ -605,14 +605,15 @@ if __name__ == '__main__':
     progressInterval = 10000
 
     #--defaults
-    iniFileName = os.getenv('SZ_INI_FILE_NAME') if os.getenv('SZ_INI_FILE_NAME', None) else appPath + os.path.sep + 'G2Module.ini'
-    sampleSize = int(os.getenv('SZ_SAMPLE_SIZE')) if os.getenv('SZ_SAMPLE_SIZE', None) and os.getenv('SZ_SAMPLE_SIZE').isdigit() else 1000
-    relationshipFilter = int(os.getenv('SZ_RELATIONSHIP_FILTER')) if os.getenv('SZ_RELATIONSHIP_FILTER', None) and os.getenv('SZ_RELATIONSHIP_FILTER').isdigit() else 3
-    chunkSize = int(os.getenv('SZ_CHUNK_SIZE')) if os.getenv('SZ_CHUNK_SIZE', None) and os.getenv('SZ_CHUNK_SIZE').isdigit() else 1000000
+    iniFileName = os.getenv('SENZING_INI_FILE_NAME') if os.getenv('SENZING_INI_FILE_NAME', None) else appPath + os.path.sep + 'G2Module.ini'
+    outputFileRoot = os.getenv('SENZING_OUTPUT_FILE_ROOT') if os.getenv('SENZING_INI_FILE_NAME', None) else None
+    sampleSize = int(os.getenv('SENZING_SAMPLE_SIZE')) if os.getenv('SENZING_SAMPLE_SIZE', None) and os.getenv('SENZING_SAMPLE_SIZE').isdigit() else 1000
+    relationshipFilter = int(os.getenv('SENZING_RELATIONSHIP_FILTER')) if os.getenv('SENZING_RELATIONSHIP_FILTER', None) and os.getenv('SENZING_RELATIONSHIP_FILTER').isdigit() else 3
+    chunkSize = int(os.getenv('SENZING_CHUNK_SIZE')) if os.getenv('SENZING_CHUNK_SIZE', None) and os.getenv('SENZING_CHUNK_SIZE').isdigit() else 1000000
 
     #--capture the command line arguments
     argParser = argparse.ArgumentParser()
-    argParser.add_argument('-o', '--output_file_root', dest='output_file_root', default=os.getenv('sz_output_file_root', None), help='root name for files created such as "/project/snapshots/snapshot1"')
+    argParser.add_argument('-o', '--output_file_root', dest='output_file_root', default=outputFileRoot, help='root name for files created such as "/project/snapshots/snapshot1"')
     argParser.add_argument('-c', '--ini_file_name', dest='ini_file_name', default=iniFileName, help='name of the g2.ini file, defaults to %s' % iniFileName)
     argParser.add_argument('-s', '--sample_size', dest='sample_size', type=int, default=sampleSize, help='defaults to %s' % sampleSize)
     argParser.add_argument('-f', '--relationship_filter', dest='relationship_filter', type=int, default=relationshipFilter, help='filter options 1=No Relationships, 2=Include possible matches, 3=Include possibly related and disclosed. Defaults to %s' % relationshipFilter)
@@ -629,7 +630,7 @@ if __name__ == '__main__':
     #--get parameters from ini file
     if not os.path.exists(iniFileName):
         print('')
-        print('An ini file was not found, please supply with the -c parameter.2' % iniFileName)
+        print('An ini file was not found, please supply with the -c parameter.')
         print('')
         sys.exit(1)
     iniParser = configparser.ConfigParser()
