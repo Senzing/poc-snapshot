@@ -22,6 +22,12 @@ except:
     print('')
     sys.exit(1)
 
+#--see if a g2 config manager present - v1.12+
+try: 
+    from G2IniParams import G2IniParams
+    from G2ConfigMgr import G2ConfigMgr
+except: G2ConfigMgr = None
+
 #---------------------------------------
 def processEntities():
     global shutDown
@@ -599,14 +605,15 @@ if __name__ == '__main__':
     progressInterval = 10000
 
     #--defaults
-    iniFileName = os.getenv('SZ_INI_FILE_NAME') if os.getenv('SZ_INI_FILE_NAME', None) else appPath + os.path.sep + 'G2Module.ini'
-    sampleSize = int(os.getenv('SZ_SAMPLE_SIZE')) if os.getenv('SZ_SAMPLE_SIZE', None) and os.getenv('SZ_SAMPLE_SIZE').isdigit() else 1000
-    relationshipFilter = int(os.getenv('SZ_RELATIONSHIP_FILTER')) if os.getenv('SZ_RELATIONSHIP_FILTER', None) and os.getenv('SZ_RELATIONSHIP_FILTER').isdigit() else 3
-    chunkSize = int(os.getenv('SZ_CHUNK_SIZE')) if os.getenv('SZ_CHUNK_SIZE', None) and os.getenv('SZ_CHUNK_SIZE').isdigit() else 1000000
+    iniFileName = os.getenv('SENZING_INI_FILE_NAME') if os.getenv('SENZING_INI_FILE_NAME', None) else appPath + os.path.sep + 'G2Module.ini'
+    outputFileRoot = os.getenv('SENZING_OUTPUT_FILE_ROOT') if os.getenv('SENZING_INI_FILE_NAME', None) else None
+    sampleSize = int(os.getenv('SENZING_SAMPLE_SIZE')) if os.getenv('SENZING_SAMPLE_SIZE', None) and os.getenv('SENZING_SAMPLE_SIZE').isdigit() else 1000
+    relationshipFilter = int(os.getenv('SENZING_RELATIONSHIP_FILTER')) if os.getenv('SENZING_RELATIONSHIP_FILTER', None) and os.getenv('SENZING_RELATIONSHIP_FILTER').isdigit() else 3
+    chunkSize = int(os.getenv('SENZING_CHUNK_SIZE')) if os.getenv('SENZING_CHUNK_SIZE', None) and os.getenv('SENZING_CHUNK_SIZE').isdigit() else 1000000
 
     #--capture the command line arguments
     argParser = argparse.ArgumentParser()
-    argParser.add_argument('-o', '--output_file_root', dest='output_file_root', default=os.getenv('sz_output_file_root', None), help='root name for files created such as "/project/snapshots/snapshot1"')
+    argParser.add_argument('-o', '--output_file_root', dest='output_file_root', default=outputFileRoot, help='root name for files created such as "/project/snapshots/snapshot1"')
     argParser.add_argument('-c', '--ini_file_name', dest='ini_file_name', default=iniFileName, help='name of the g2.ini file, defaults to %s' % iniFileName)
     argParser.add_argument('-s', '--sample_size', dest='sample_size', type=int, default=sampleSize, help='defaults to %s' % sampleSize)
     argParser.add_argument('-f', '--relationship_filter', dest='relationship_filter', type=int, default=relationshipFilter, help='filter options 1=No Relationships, 2=Include possible matches, 3=Include possibly related and disclosed. Defaults to %s' % relationshipFilter)
@@ -623,7 +630,7 @@ if __name__ == '__main__':
     #--get parameters from ini file
     if not os.path.exists(iniFileName):
         print('')
-        print('ini file %s not found!' % iniFileName)
+        print('An ini file was not found, please supply with the -c parameter.')
         print('')
         sys.exit(1)
     iniParser = configparser.ConfigParser()
@@ -635,27 +642,57 @@ if __name__ == '__main__':
         print('')
         sys.exit(1)
 
+    #--use config file if in the ini file, otherwise expect to get from database with config manager lib
     try: configTableFile = iniParser.get('SQL', 'G2CONFIGFILE')
-    except: 
+    except: configTableFile = None
+    if not configTableFile and not G2ConfigMgr:
         print('')
-        print('G2CONFIGFILE parameter not found in [SQL] section of the ini file')
+        print('Config information missing from ini file and no config manager present!')
         print('')
         sys.exit(1)
 
-    #--get the config
-    try: cfgData = json.load(open(configTableFile), encoding="utf-8")
-    except ValueError as e:
-        print('')
-        print('G2CONFIGFILE: %s has invalid json' % configTableFile)
-        print(e)
-        print('')
-        sys.exit(1)
-    except IOError as e:
-        print('')
-        print('G2CONFIGFILE: %s was not found' % configTableFile)
-        print(e)
-        print('')
-        sys.exit(1)
+    #--get the config from the file
+    if configTableFile:
+        try: cfgData = json.load(open(configTableFile), encoding="utf-8")
+        except ValueError as e:
+            print('')
+            print('G2CONFIGFILE: %s has invalid json' % configTableFile)
+            print(e)
+            print('')
+            sys.exit(1)
+        except IOError as e:
+            print('')
+            print('G2CONFIGFILE: %s was not found' % configTableFile)
+            print(e)
+            print('')
+            sys.exit(1)
+
+    #--get the config from the config manager
+    else:
+        iniParamCreator = G2IniParams()
+        iniParams = iniParamCreator.getJsonINIParams(iniFileName)
+        try: 
+            g2ConfigMgr = G2ConfigMgr()
+            g2ConfigMgr.initV2('pyG2ConfigMgr', iniParams, False)
+            defaultConfigID = bytearray() 
+            g2ConfigMgr.getDefaultConfigID(defaultConfigID)
+            if len(defaultConfigID) == 0:
+                print('')
+                print('No default config stored in database. (see https://senzing.zendesk.com/hc/en-us/articles/360036587313)')
+                print('')
+                sys.exit(1)
+            defaultConfigDoc = bytearray() 
+            g2ConfigMgr.getConfig(defaultConfigID, defaultConfigDoc)
+            if len(defaultConfigDoc) == 0:
+                print('')
+                print('No default config stored in database. (see https://senzing.zendesk.com/hc/en-us/articles/360036587313)')
+                print('')
+                sys.exit(1)
+            cfgData = json.loads(defaultConfigDoc.decode())
+            g2ConfigMgr.destroy()
+        except:
+            #--error already printed by the api wrapper
+            sys.exit(1)
 
     #--need these config tables in memory for fast lookup
     dsrcLookup = {}
