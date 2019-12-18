@@ -1,18 +1,19 @@
 #! /usr/bin/env python3
-pocUtilsVersion = 2.2
+pocUtilsVersion = '2.2'
 
 #--python imports
 import argparse
-try: import configparser
-except: import ConfigParser as configparser
+import csv
+import json
 import os
-import sys
+import random
 import signal
+import sys
 import time
 from datetime import datetime, timedelta
-import json
-import csv
-import random
+
+try: import configparser
+except: import ConfigParser as configparser
 
 #--senzing python classes
 try: from G2Database import G2Database
