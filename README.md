@@ -11,6 +11,7 @@ The poc_snapshot exports all the same fields as G2Export except for entity_name 
 - RELATED_ENTITY_ID
 - MATCH_LEVEL
 - MATCH_KEY
+- MATCH_SCORE
 - DATA_SOURCE
 - RECORD_ID
 
@@ -61,7 +62,7 @@ optional arguments:
 
 ### Prerequisites
 - python 3.6 or higher
-- Senzing API version 1.7 or higher
+- Senzing API version 1.10 or higher
 
 ### Installation
 

@@ -1,5 +1,5 @@
 #! /usr/bin/env python3
-pocUtilsVersion = '2.2'
+pocUtilsVersion = '2.3.0'
 
 #--python imports
 import argparse
@@ -606,7 +606,7 @@ if __name__ == '__main__':
     progressInterval = 10000
 
     #--defaults
-    iniFileName = os.getenv('SENZING_INI_FILE_NAME') if os.getenv('SENZING_INI_FILE_NAME', None) else appPath + os.path.sep + 'G2Module.ini'
+    iniFileName = os.getenv('SENZING_CONFIG_FILE') if os.getenv('SENZING_CONFIG_FILE', None) else appPath + os.path.sep + 'G2Module.ini'
     outputFileRoot = os.getenv('SENZING_OUTPUT_FILE_ROOT') if os.getenv('SENZING_INI_FILE_NAME', None) else None
     sampleSize = int(os.getenv('SENZING_SAMPLE_SIZE')) if os.getenv('SENZING_SAMPLE_SIZE', None) and os.getenv('SENZING_SAMPLE_SIZE').isdigit() else 1000
     relationshipFilter = int(os.getenv('SENZING_RELATIONSHIP_FILTER')) if os.getenv('SENZING_RELATIONSHIP_FILTER', None) and os.getenv('SENZING_RELATIONSHIP_FILTER').isdigit() else 3
@@ -640,6 +640,14 @@ if __name__ == '__main__':
     except: 
         print('')
         print('CONNECTION parameter not found in [SQL] section of the ini file')
+        print('')
+        sys.exit(1)
+
+    #--try to open the database
+    g2Dbo = G2Database(g2dbUri)
+    if not g2Dbo.success:
+        print('')
+        print('Could not connect to database')
         print('')
         sys.exit(1)
 
@@ -709,21 +717,13 @@ if __name__ == '__main__':
         if cfgRecord['FTYPE_CODE'] == 'AMBIGUOUS_ENTITY':
             ambiguousFtypeID = cfgRecord['FTYPE_ID']
 
-    #--try to open the database
-    g2Dbo = G2Database(g2dbUri)
-    if not g2Dbo.success:
-        print('')
-        print('Could not connect to database')
-        print('')
-        sys.exit(1)
-
     #--check the output file
     if not outputFileRoot:
         print('')
         print('Please use -o to select and output path and root file name such as /project/audit/run1')
         print('')
         sys.exit(1)
-    if '.' in outputFileRoot[1:]:
+    if os.path.splitext(outputFileRoot)[1]:
         print('')
         print("Please don't use a file extension as both a .json and a .csv file will be created")
         print('')
