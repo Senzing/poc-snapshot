@@ -11,7 +11,6 @@ The poc_snapshot exports all the same fields as G2Export except for entity_name 
 - RELATED_ENTITY_ID
 - MATCH_LEVEL
 - MATCH_KEY
-- MATCH_SCORE
 - DATA_SOURCE
 - RECORD_ID
 
