@@ -1,5 +1,5 @@
 #! /usr/bin/env python3
-pocUtilsVersion = '2.2'
+pocUtilsVersion = '2.3.0'
 
 #--python imports
 import argparse
@@ -606,8 +606,8 @@ if __name__ == '__main__':
     progressInterval = 10000
 
     #--defaults
-    iniFileName = os.getenv('SENZING_INI_FILE_NAME') if os.getenv('SENZING_INI_FILE_NAME', None) else appPath + os.path.sep + 'G2Module.ini'
-    outputFileRoot = os.getenv('SENZING_OUTPUT_FILE_ROOT') if os.getenv('SENZING_INI_FILE_NAME', None) else None
+    iniFileName = os.getenv('SENZING_CONFIG_FILE') if os.getenv('SENZING_CONFIG_FILE', None) else appPath + os.path.sep + 'G2Module.ini'
+    outputFileRoot = os.getenv('SENZING_OUTPUT_FILE_ROOT') if os.getenv('SENZING_OUTPUT_FILE_ROOT', None) else None
     sampleSize = int(os.getenv('SENZING_SAMPLE_SIZE')) if os.getenv('SENZING_SAMPLE_SIZE', None) and os.getenv('SENZING_SAMPLE_SIZE').isdigit() else 1000
     relationshipFilter = int(os.getenv('SENZING_RELATIONSHIP_FILTER')) if os.getenv('SENZING_RELATIONSHIP_FILTER', None) and os.getenv('SENZING_RELATIONSHIP_FILTER').isdigit() else 3
     chunkSize = int(os.getenv('SENZING_CHUNK_SIZE')) if os.getenv('SENZING_CHUNK_SIZE', None) and os.getenv('SENZING_CHUNK_SIZE').isdigit() else 1000000
@@ -615,7 +615,7 @@ if __name__ == '__main__':
     #--capture the command line arguments
     argParser = argparse.ArgumentParser()
     argParser.add_argument('-o', '--output_file_root', dest='output_file_root', default=outputFileRoot, help='root name for files created such as "/project/snapshots/snapshot1"')
-    argParser.add_argument('-c', '--ini_file_name', dest='ini_file_name', default=iniFileName, help='name of the g2.ini file, defaults to %s' % iniFileName)
+    argParser.add_argument('-c', '--config_file_name', dest='ini_file_name', default=iniFileName, help='name of the g2.ini file, defaults to %s' % iniFileName)
     argParser.add_argument('-s', '--sample_size', dest='sample_size', type=int, default=sampleSize, help='defaults to %s' % sampleSize)
     argParser.add_argument('-f', '--relationship_filter', dest='relationship_filter', type=int, default=relationshipFilter, help='filter options 1=No Relationships, 2=Include possible matches, 3=Include possibly related and disclosed. Defaults to %s' % relationshipFilter)
     argParser.add_argument('-n', '--no_csv_export', dest='no_csv_export', action='store_true', default=False, help='compute json stats only, do not export csv file')
@@ -640,6 +640,14 @@ if __name__ == '__main__':
     except: 
         print('')
         print('CONNECTION parameter not found in [SQL] section of the ini file')
+        print('')
+        sys.exit(1)
+
+    #--try to open the database
+    g2Dbo = G2Database(g2dbUri)
+    if not g2Dbo.success:
+        print('')
+        print('Could not connect to database')
         print('')
         sys.exit(1)
 
@@ -709,21 +717,13 @@ if __name__ == '__main__':
         if cfgRecord['FTYPE_CODE'] == 'AMBIGUOUS_ENTITY':
             ambiguousFtypeID = cfgRecord['FTYPE_ID']
 
-    #--try to open the database
-    g2Dbo = G2Database(g2dbUri)
-    if not g2Dbo.success:
-        print('')
-        print('Could not connect to database')
-        print('')
-        sys.exit(1)
-
     #--check the output file
     if not outputFileRoot:
         print('')
         print('Please use -o to select and output path and root file name such as /project/audit/run1')
         print('')
         sys.exit(1)
-    if '.' in outputFileRoot[1:]:
+    if os.path.splitext(outputFileRoot)[1]:
         print('')
         print("Please don't use a file extension as both a .json and a .csv file will be created")
         print('')

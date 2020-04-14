@@ -61,7 +61,7 @@ optional arguments:
 
 ### Prerequisites
 - python 3.6 or higher
-- Senzing API version 1.7 or higher
+- Senzing API version 1.10 or higher
 
 ### Installation
 
