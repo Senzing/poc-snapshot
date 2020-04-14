@@ -607,7 +607,7 @@ if __name__ == '__main__':
 
     #--defaults
     iniFileName = os.getenv('SENZING_CONFIG_FILE') if os.getenv('SENZING_CONFIG_FILE', None) else appPath + os.path.sep + 'G2Module.ini'
-    outputFileRoot = os.getenv('SENZING_OUTPUT_FILE_ROOT') if os.getenv('SENZING_INI_FILE_NAME', None) else None
+    outputFileRoot = os.getenv('SENZING_OUTPUT_FILE_ROOT') if os.getenv('SENZING_OUTPUT_FILE_ROOT', None) else None
     sampleSize = int(os.getenv('SENZING_SAMPLE_SIZE')) if os.getenv('SENZING_SAMPLE_SIZE', None) and os.getenv('SENZING_SAMPLE_SIZE').isdigit() else 1000
     relationshipFilter = int(os.getenv('SENZING_RELATIONSHIP_FILTER')) if os.getenv('SENZING_RELATIONSHIP_FILTER', None) and os.getenv('SENZING_RELATIONSHIP_FILTER').isdigit() else 3
     chunkSize = int(os.getenv('SENZING_CHUNK_SIZE')) if os.getenv('SENZING_CHUNK_SIZE', None) and os.getenv('SENZING_CHUNK_SIZE').isdigit() else 1000000
@@ -615,7 +615,7 @@ if __name__ == '__main__':
     #--capture the command line arguments
     argParser = argparse.ArgumentParser()
     argParser.add_argument('-o', '--output_file_root', dest='output_file_root', default=outputFileRoot, help='root name for files created such as "/project/snapshots/snapshot1"')
-    argParser.add_argument('-c', '--ini_file_name', dest='ini_file_name', default=iniFileName, help='name of the g2.ini file, defaults to %s' % iniFileName)
+    argParser.add_argument('-c', '--config_file_name', dest='ini_file_name', default=iniFileName, help='name of the g2.ini file, defaults to %s' % iniFileName)
     argParser.add_argument('-s', '--sample_size', dest='sample_size', type=int, default=sampleSize, help='defaults to %s' % sampleSize)
     argParser.add_argument('-f', '--relationship_filter', dest='relationship_filter', type=int, default=relationshipFilter, help='filter options 1=No Relationships, 2=Include possible matches, 3=Include possibly related and disclosed. Defaults to %s' % relationshipFilter)
     argParser.add_argument('-n', '--no_csv_export', dest='no_csv_export', action='store_true', default=False, help='compute json stats only, do not export csv file')
